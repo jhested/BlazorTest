@@ -1,0 +1,77 @@
+﻿@page "/viewjob/{JobId}"
+
+<PageTitle>Weather forecast</PageTitle>
+
+@using Microsoft.AspNetCore.WebUtilities
+@using MyBlazerServerApp.Data
+@using Radzen
+@using Radzen.Blazor
+@inject JobHandlerJobService JobHandlerService
+@inject NavigationManager NavManager
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+<div class="container">
+    <div class="row py-5">
+        <div class="col">
+            <RadzenCard>
+                <RadzenDataList WrapItems="true" AllowPaging="true" Data="@forecasts" TItem="WorkTask" PageSize="25" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
+                    <Template Context="job">
+                        <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
+                            <div class="container">
+                                <div class="row" style="margin-left: calc(var(--bs-gutter-x) * -1); margin-right: calc(var(--bs-gutter-x) * -1)">
+                                    <div class="col-lg-3 p-3 product-title" style="background-color: @job.State">
+                                            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" >@(job.Name)</RadzenText>
+                                    </div>
+                                    <div class="col-lg-7 p-3">
+                                        <div class="row d-flex">
+                                            <div class="col-md-6 col-lg-2">
+                                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="mb-0">@(job.State)</RadzenText>                                                
+                                            </div>
+                                            <div class="col-md-6 col-lg-2">
+                                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="mb-0">@(job.Type)</RadzenText>                                                
+                                            </div>
+                                            <div class="col-md-6 col-lg-3">
+                                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="mb-0">Completed</RadzenText>
+                                                <RadzenText TextStyle="TextStyle.Body2" class="mb-sm-2 mb-lg-0">12</RadzenText>
+                                            </div>
+                                            <div class="col-md-6 col-lg-3">
+                                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="mb-0">In progess</RadzenText>
+                                                <RadzenText TextStyle="TextStyle.Body2" class="mb-sm-2 mb-lg-0">5</RadzenText>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 p-3">
+                                        <RadzenButton Text="Open" Class="w-100" />
+                                    </div>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </Template>
+                </RadzenDataList>
+
+            </RadzenCard>
+        </div>
+    </div>
+</div>
+}
+
+@code {
+    private IEnumerable<WorkTask>? forecasts;
+
+    [ParameterAttribute]
+    public string JobId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await JobHandlerService.GetTasksAsync(int.Parse(JobId));
+    } 
+}
